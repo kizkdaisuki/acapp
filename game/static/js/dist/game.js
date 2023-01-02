@@ -7,10 +7,12 @@ class AcGameMenu {
         <div class="ac-game-menu-field-item ac-game-menu-field-item-single-mode">
             单人模式
         </div>
+        <br>
         <div class="ac-game-menu-field-item ac-game-menu-field-item-multi-mode">
             多人模式
         </div>
-        <div class="ac-game-menu-field-item ac-game-menu-field-item-settings-mode">
+        <br>
+        <div class="ac-game-menu-field-item ac-game-menu-field-item-settings">
             设置
         </div>
     </div>
@@ -19,58 +21,71 @@ class AcGameMenu {
         this.root.$ac_game.append(this.$menu);
         this.$single_mode = this.$menu.find('.ac-game-menu-field-item-single-mode');
         this.$multi_mode = this.$menu.find('.ac-game-menu-field-item-multi-mode');
-        this.$settings_mode = this.$menu.find('.ac-game-menu-field-item-settings-mode');
+        this.$settings = this.$menu.find('.ac-game-menu-field-item-settings');
+
         this.start();
     }
+
     start() {
-        this.add_lestening_events();
+        this.add_listening_events();
     }
-    add_lestening_events() {
+
+    add_listening_events() {
         let outer = this;
-        this.$single_mode.click(function() {
+        this.$single_mode.click(function(){
             outer.hide();
             outer.root.playground.show();
-        })
+        });
+        this.$multi_mode.click(function(){
+            console.log("click multi mode");
+        });
+        this.$settings.click(function(){
+            console.log("click settings");
+        });
     }
-    show() {
+
+    show() {  // 显示menu界面
         this.$menu.show();
     }
-    hide() {
+
+    hide() {  // 关闭menu界面
         this.$menu.hide();
     }
-}let AC_GAME_OBJECTS = [];
+}
+let AC_GAME_OBJECTS = [];
+
 class AcGameObject {
     constructor() {
         AC_GAME_OBJECTS.push(this);
-        this.has_called_start = false;
-        this.timedelta = 0;
-    }
-    start() { // 只会在第一帧执行
 
+        this.has_called_start = false;  // 是否执行过start函数
+        this.timedelta = 0;  // 当前帧距离上一帧的时间间隔
     }
-    update() { // 每一帧会执行一次
 
+    start() {  // 只会在第一帧执行一次
     }
-    render() {
 
+    update() {  // 每一帧均会执行一次
     }
-    on_destroy() { // 在被销毁之前执行一次
 
+    on_destroy() {  // 在被销毁前执行一次
     }
-    destroy() {
+
+    destroy() {  // 删掉该物体
         this.on_destroy();
-        for (let i = 0; i < AC_GAME_OBJECTS.length; i++) {
+
+        for (let i = 0; i < AC_GAME_OBJECTS.length; i ++ ) {
             if (AC_GAME_OBJECTS[i] === this) {
                 AC_GAME_OBJECTS.splice(i, 1);
                 break;
             }
         }
     }
-
 }
-let last_timestamp = 0;
+
+let last_timestamp;
 let AC_GAME_ANIMATION = function(timestamp) {
-    for (let i = 0; i < AC_GAME_OBJECTS.length; i++) {
+    for (let i = 0; i < AC_GAME_OBJECTS.length; i ++ ) {
         let obj = AC_GAME_OBJECTS[i];
         if (!obj.has_called_start) {
             obj.start();
@@ -79,33 +94,38 @@ let AC_GAME_ANIMATION = function(timestamp) {
             obj.timedelta = timestamp - last_timestamp;
             obj.update();
         }
-
-        last_timestamp = timestamp;
-        requestAnimationFrame(AC_GAME_ANIMATION);
     }
+    last_timestamp = timestamp;
+
+    requestAnimationFrame(AC_GAME_ANIMATION);
 }
-requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //继承自游戏引擎基类
+
+
+requestAnimationFrame(AC_GAME_ANIMATION);
+class GameMap extends AcGameObject {
     constructor(playground) {
-        super(); //自函数功能：调用基类的构造函数
+        super();
         this.playground = playground;
-        this.$canvas = $(`<canvas></canvas>`); //创建一个canvas的jQuery对象，就是我们要实现的画布
-        this.ctx = this.$canvas[0].getContext('2d'); //jQuery对象是一个数组，第一个索引是html对象
-        //设置画布的宽高
+        this.$canvas = $(`<canvas></canvas>`);
+        this.ctx = this.$canvas[0].getContext('2d');
         this.ctx.canvas.width = this.playground.width;
         this.ctx.canvas.height = this.playground.height;
-        console.log(this.ctx.canvas.width);
         this.playground.$playground.append(this.$canvas);
     }
 
-    start() {}
-    update() { //游戏地图每帧都要渲染
+    start() {
+    }
+
+    update() {
         this.render();
     }
+
     render() {
         this.ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
-}class Particle extends AcGameObject {
+}
+class Particle extends AcGameObject {
     constructor(playground, x, y, radius, vx, vy, color, speed, move_length) {
         super();
         this.playground = playground;
@@ -122,7 +142,8 @@ requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //
         this.eps = 1;
     }
 
-    start() {}
+    start() {
+    }
 
     update() {
         if (this.move_length < this.eps || this.speed < this.eps) {
@@ -144,7 +165,8 @@ requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
     }
-}class Player extends AcGameObject {
+}
+class Player extends AcGameObject {
     constructor(playground, x, y, radius, color, speed, is_me) {
         super();
         this.playground = playground;
@@ -196,7 +218,7 @@ requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //
         });
 
         $(window).keydown(function(e) {
-            if (e.which === 81) { // q
+            if (e.which === 81) {  // q
                 outer.cur_skill = "fireball";
                 return false;
             }
@@ -204,12 +226,10 @@ requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //
     }
 
     shoot_fireball(tx, ty) {
-        let x = this.x,
-            y = this.y;
+        let x = this.x, y = this.y;
         let radius = this.playground.height * 0.01;
         let angle = Math.atan2(ty - this.y, tx - this.x);
-        let vx = Math.cos(angle),
-            vy = Math.sin(angle);
+        let vx = Math.cos(angle), vy = Math.sin(angle);
         let color = "orange";
         let speed = this.playground.height * 0.5;
         let move_length = this.playground.height * 1;
@@ -230,13 +250,11 @@ requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //
     }
 
     is_attacked(angle, damage) {
-        for (let i = 0; i < 20 + Math.random() * 10; i++) {
-            let x = this.x,
-                y = this.y;
+        for (let i = 0; i < 20 + Math.random() * 10; i ++ ) {
+            let x = this.x, y = this.y;
             let radius = this.radius * Math.random() * 0.1;
             let angle = Math.PI * 2 * Math.random();
-            let vx = Math.cos(angle),
-                vy = Math.sin(angle);
+            let vx = Math.cos(angle), vy = Math.sin(angle);
             let color = this.color;
             let speed = this.speed * 10;
             let move_length = this.radius * Math.random() * 5;
@@ -295,13 +313,14 @@ requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //
     }
 
     on_destroy() {
-        for (let i = 0; i < this.playground.players.length; i++) {
+        for (let i = 0; i < this.playground.players.length; i ++ ) {
             if (this.playground.players[i] === this) {
                 this.playground.players.splice(i, 1);
             }
         }
     }
-}class FireBall extends AcGameObject {
+}
+class FireBall extends AcGameObject {
     constructor(playground, player, x, y, radius, vx, vy, color, speed, move_length, damage) {
         super();
         this.playground = playground;
@@ -319,7 +338,8 @@ requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //
         this.eps = 0.1;
     }
 
-    start() {}
+    start() {
+    }
 
     update() {
         if (this.move_length < this.eps) {
@@ -332,7 +352,7 @@ requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //
         this.y += this.vy * moved;
         this.move_length -= moved;
 
-        for (let i = 0; i < this.playground.players.length; i++) {
+        for (let i = 0; i < this.playground.players.length; i ++ ) {
             let player = this.playground.players[i];
             if (this.player !== player && this.is_collision(player)) {
                 this.attack(player);
@@ -367,24 +387,25 @@ requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
     }
-}class AcGamePlayground {
+}
+class AcGamePlayground {
     constructor(root) {
-        this.root = root
-        this.$playground = $(`<div class = "ac-game-playground"></div>`);
+        this.root = root;
+        this.$playground = $(`<div class="ac-game-playground"></div>`);
 
-        this.hide();
+        // this.hide();
         this.root.$ac_game.append(this.$playground);
-        this.start();
         this.width = this.$playground.width();
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
         this.players = [];
         this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, "white", this.height * 0.15, true));
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 5; i ++ ) {
             this.players.push(new Player(this, this.width / 2, this.height / 2, this.height * 0.05, this.get_random_color(), this.height * 0.15, false));
         }
 
+        this.start();
     }
 
     get_random_color() {
@@ -392,21 +413,26 @@ requestAnimationFrame(AC_GAME_ANIMATION);class GameMap extends AcGameObject { //
         return colors[Math.floor(Math.random() * 5)];
     }
 
-
     start() {
+    }
 
-    }
-    hide() {
-        this.$playground.hide();
-    }
-    show() {
+    show() {  // 打开playground界面
         this.$playground.show();
     }
-}export class AcGame {
+
+    hide() {  // 关闭playground界面
+        this.$playground.hide();
+    }
+}
+export class AcGame {
     constructor(id) {
         this.id = id;
         this.$ac_game = $('#' + id);
         this.menu = new AcGameMenu(this);
         this.playground = new AcGamePlayground(this);
+
+        this.start();
     }
+
+    start() {}
 }

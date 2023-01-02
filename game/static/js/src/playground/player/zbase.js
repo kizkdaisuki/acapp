@@ -50,7 +50,7 @@ class Player extends AcGameObject {
         });
 
         $(window).keydown(function(e) {
-            if (e.which === 81) { // q
+            if (e.which === 81) {  // q
                 outer.cur_skill = "fireball";
                 return false;
             }
@@ -58,12 +58,10 @@ class Player extends AcGameObject {
     }
 
     shoot_fireball(tx, ty) {
-        let x = this.x,
-            y = this.y;
+        let x = this.x, y = this.y;
         let radius = this.playground.height * 0.01;
         let angle = Math.atan2(ty - this.y, tx - this.x);
-        let vx = Math.cos(angle),
-            vy = Math.sin(angle);
+        let vx = Math.cos(angle), vy = Math.sin(angle);
         let color = "orange";
         let speed = this.playground.height * 0.5;
         let move_length = this.playground.height * 1;
@@ -84,13 +82,11 @@ class Player extends AcGameObject {
     }
 
     is_attacked(angle, damage) {
-        for (let i = 0; i < 20 + Math.random() * 10; i++) {
-            let x = this.x,
-                y = this.y;
+        for (let i = 0; i < 20 + Math.random() * 10; i ++ ) {
+            let x = this.x, y = this.y;
             let radius = this.radius * Math.random() * 0.1;
             let angle = Math.PI * 2 * Math.random();
-            let vx = Math.cos(angle),
-                vy = Math.sin(angle);
+            let vx = Math.cos(angle), vy = Math.sin(angle);
             let color = this.color;
             let speed = this.speed * 10;
             let move_length = this.radius * Math.random() * 5;
@@ -149,7 +145,7 @@ class Player extends AcGameObject {
     }
 
     on_destroy() {
-        for (let i = 0; i < this.playground.players.length; i++) {
+        for (let i = 0; i < this.playground.players.length; i ++ ) {
             if (this.playground.players[i] === this) {
                 this.playground.players.splice(i, 1);
             }
